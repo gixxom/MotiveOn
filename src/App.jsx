@@ -1,57 +1,57 @@
-import { useState } from 'react'
-// import { Button } from "./components/Common/Button";
-// import Layout from './components/Common/Layout';
-// import Sidebar from './components/Common/Sidebar';
-// import ModalWrapper from './components/Common/ModalWrapper';
-// import InputField from './components/Common/InputField.jsx';
-// import LoginForm from "./components/Login/LoginForm";
-import { createGlobalStyle } from 'styled-components';
-// import PasswordFind from "./components/Login/PasswordFind.jsx";
-// import PasswordError from "./components/Login/PasswordError.jsx";
-// import PasswordComfirm from "./components/Login/PasswordComfirm.jsx";
-// import WorkPage from './components/Work/WorkPage.jsx';
-// import MyWorkPage from './components/Work/MyWorkPage.jsx';
-// import RequestedWorkPage from './components/Work/RequestedWorkPage.jsx';
-// import WorkDetail from './components/Work/WorkDetail.jsx';
-// import WorkDetailEdit from './components/Work/WorkDetailEdit.jsx';
-import WorkRegist from './components/Work/WorkRegist.jsx'
+// import { useState } from 'react'
+// // import { Button } from "./components/Common/Button";
+// import Layout from './components/ommon/Layout';
+// // import Sidebar from './components/Common/Sidebar';
+// // import ModalWrapper from './components/Common/ModalWrapper';
+// // import InputField from './components/Common/InputField.jsx';
+// // import LoginForm from "./components/Login/LoginForm";
+// import { createGlobalStyle } from 'styled-components';
+// // import PasswordFind from "./components/Login/PasswordFind.jsx";
+// // import PasswordError from "./components/Login/PasswordError.jsx";
+// // import PasswordComfirm from "./components/Login/PasswordComfirm.jsx";
+// // import WorkPage from './components/Work/WorkPage.jsx';
+// // import MyWorkPage from './components/Work/MyWorkPage.jsx';
+// // import RequestedWorkPage from './components/Work/RequestedWorkPage.jsx';
+// // import WorkDetail from './components/Work/WorkDetail.jsx';
+// // import WorkDetailEdit from './components/Work/WorkDetailEdit.jsx';
+// import WorkRegist from './components/Work/WorkRegist.jsx'
 
-const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Poppins;
-  }
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-`
-
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-    <GlobalStyle />
-    {/* <LoginForm></LoginForm> */}
-    {/* <PasswordFind></PasswordFind> */}
-    {/* <PasswordError></PasswordError> */}
-    {/* <PasswordComfirm /> */}
-    {/* <WorkPage /> */}
-    {/* <MyWorkPage />  */}
-    {/* <RequestedWorkPage /> */}
-    {/* <WorkDetailEdit /> */}
-    <WorkRegist />
-    </>
-  )
-}
-
-export default App;
+// const GlobalStyle = createGlobalStyle`
+//   * {
+//     margin: 0;
+//     padding: 0;
+//     box-sizing: border-box;
+//     font-family: Poppins;
+//   }
+//   a {
+//     text-decoration: none;
+//     color: inherit;
+//   }
+// `
 
 
+// function App() {
+//   const [count, setCount] = useState(0)
+
+//   return (
+//     <>
+//     <GlobalStyle />
+//     {/* <LoginForm></LoginForm> */}
+//     {/* <PasswordFind></PasswordFind> */}
+//     {/* <PasswordError></PasswordError> */}
+//     {/* <PasswordComfirm /> */}
+//     {/* <WorkPage /> */}
+//     {/* <MyWorkPage />  */}
+//     {/* <RequestedWorkPage /> */}
+//     {/* <WorkDetailEdit /> */}
+//     <WorkRegist />
+//     </>
+//   )
+// }
+
+// export default App;
+
+// -----------------------------------------------
 
 
 // // //레이아웃 확인용 
@@ -164,3 +164,45 @@ export default App;
 // }
 
 // export default App;
+
+
+
+
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { createGlobalStyle } from 'styled-components';
+import LoginForm from './components/Login/LoginForm';
+import PasswordConfirm from './components/Login/PasswordComfirm';
+import PasswordError from './components/Login/PasswordError';
+import PasswordFind from './components/Login/PasswordFind';
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Poppins;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+`
+
+function AppRouter() {
+  return (
+    <Router>
+      <GlobalStyle />
+      <Routes>
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/login/passwordConfirm" element={<PasswordConfirm />} />
+        <Route path="/login/passwordError" element={<PasswordError />} />
+        <Route path="/login/passwordFind" element={<PasswordFind />} />
+        {/* 기본 경로를 로그인 페이지로 리디렉션 */}
+        <Route path="*" element={<LoginForm />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default AppRouter;

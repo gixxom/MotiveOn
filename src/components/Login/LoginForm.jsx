@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -67,6 +68,7 @@ const LinkText = styled.a`
 
 
 function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useUserStore();
@@ -115,7 +117,7 @@ function Login() {
           placeholder=" 비밀번호를 입력하세요."
         />
         <Button ref={buttonRef} onClick={handleSubmit} label="로그인" />
-        <LinkText href="#">비밀번호를 잊으셨나요?</LinkText>
+        <LinkText onClick={() => navigate("/Login/PasswordFind")}>비밀번호를 잊으셨나요?</LinkText>
       </Box>
     </Container>
   );
