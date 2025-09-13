@@ -7,18 +7,18 @@ export const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-;`
+`;
 export const Card = styled.div`
   width: 100%;
   border: 1px solid dodgerblue;
   cursor: pointer;
   padding: 10px;
-;`
+`;
 export const Text = styled.div`
   color: #333;
   overflow-wrap: break-word;
   word-break: break-all;
-;`
+`;
 
 function Notice() {
   const [data, setData] = useState([]);
