@@ -26,7 +26,7 @@ export default function RequestedWorkPage() {
         maxWidth: "390px",
         margin: "0 auto",
         fontFamily: "Arial, sans-serif",
-        height: "100vh",
+        height: "788px",
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
@@ -60,16 +60,16 @@ export default function RequestedWorkPage() {
           onChange={handleChange("deadline")}
         />
 
-        {/* 상태 */}
-        <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-          <div style={{ width: "70px", fontSize: "13px", fontWeight: "bold", color: "#555" }}>
-            상태
-          </div>
-          <StatusBadge label={formData.status} />
-        </div>
+       {/* 상태 */}
+<div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+  <div style={{ width: "40px", fontSize: "14px", fontWeight: "bold", color: "#333" }}>
+    상태
+  </div>
+  <StatusBadge label={formData.status} />
+</div>
 
         {/* 내용 textarea */}
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: "385px" }}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: "325px" }}>
           <label
             style={{
               fontSize: "14px",

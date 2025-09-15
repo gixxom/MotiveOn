@@ -1,7 +1,11 @@
 import React from "react";
 import { IconPlus } from "../Work/icons";
+import { useNavigate } from "react-router-dom";
+
 
 export default function MyWorkListPage() {
+      const navigate = useNavigate();
+  
   const workList = [
     { title: "업무 제목", dept: "00부", name: "김00", status: "대기", deadline: "2025.09.07" },
     { title: "업무 제목", dept: "00부", name: "김00", status: "대기", deadline: "2025.09.07" },
@@ -22,7 +26,6 @@ export default function MyWorkListPage() {
           fontWeight: "bold",
         }}
       >
-        <span style={{ marginRight: "20px", cursor: "pointer" }}>☰</span>
         <span>요청한 업무 &gt; 전체</span>
       </div>
 
@@ -80,6 +83,8 @@ export default function MyWorkListPage() {
           alignItems: "center",
           justifyContent: "center",
         }}
+              onClick={() => navigate("/work/regist")} // ✅ 함수로 전달
+
       >
         <IconPlus />
       </button>

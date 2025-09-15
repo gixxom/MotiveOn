@@ -9,10 +9,10 @@ export default function RequestedWorkPage() {
         maxWidth: "390px",
         margin: "0 auto",
         fontFamily: "Arial, sans-serif",
-        height: "100vh", // 화면 전체 높이
+        height: "788px", // 화면 전체 높이
         display: "flex",
         flexDirection: "column",
-        padding: "16px",
+        padding: "16px 16px 0px",
         boxSizing: "border-box",
       }}
     >

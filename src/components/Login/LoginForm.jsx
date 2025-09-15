@@ -7,6 +7,7 @@ import logo from "../../assets/img/motiveon-login.png";
 import Button from '../common/Button'
 import InputField from '../common/InputField'
 import bgImage from "../../assets/img/빌딩.jpg";
+import axios from 'axios';
 
 
 // Zustand Store
@@ -69,42 +70,42 @@ const LinkText = styled.a`
 
 function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [eno, setEno] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useUserStore();
   const buttonRef = useRef(null);
 
-  async function handleSubmit() {
-    try {
-      if (email && password) {
-        console.log("로그인: " + email + " " + password);
-        login(email);
-        setEmail("");
-        setPassword("");
-      } else {
-        alert("사번과 패스워드를 입력해주세요.");
-      }
-    } catch (error) {
-      console.log(error);
-      alert("로그인 실패");
-    }
-  }
+const { login } = useUserStore();
 
-  function handleKeyDown(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      buttonRef.current.click();
-    }
-  }
+async function handleSubmit() {
+  try {
+    const res = await axios.post("/api/commons/login", {
+      eno: eno,
+      pwd: password
+    });
 
+    if (res.status === 200) {
+      // 로그인 성공 → sessionStorage에 저장
+      login(res.data.eno);   // Zustand store + sessionStorage
+      navigate("/home");
+    }
+  } catch (error) {
+    alert("로그인 실패: 사번 또는 비밀번호를 확인하세요.");
+  }
+}
+function handleKeyDown(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buttonRef.current.click();
+  }
+}
   return (
     <Container>
       <Box>
         <Logo src={logo} alt="logo" />
         <InputField
           type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={eno}
+          onChange={(e) => setEno(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder=" 사번을 입력하세요."
         />
