@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, forwardRef  } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components'
 import { create } from 'zustand'
@@ -95,7 +95,7 @@ async function handleSubmit() {
 function handleKeyDown(e) {
   if (e.key === "Enter") {
     e.preventDefault();
-    buttonRef.current.click();
+       handleSubmit(); // 바로 실행
   }
 }
   return (
@@ -122,7 +122,7 @@ function handleKeyDown(e) {
       </Box>
     </Container>
   );
+
+
 }
-
 export default Login;
-
