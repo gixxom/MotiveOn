@@ -10,13 +10,12 @@ import bgImage from "../../assets/img/빌딩.jpg";
 import axios from 'axios';
 
 
-// Zustand Store
 export const useUserStore = create(
   persist(
     (set) => ({
       user: null,
       isLoggedIn: false,
-      login: (email) => set({ user: { email: email }, isLoggedIn: true }),
+      login: (user) => set({ user: user, isLoggedIn: true }), 
       logout: () => set({ user: null, isLoggedIn: false }),
     }),
     {
@@ -86,7 +85,7 @@ async function handleSubmit() {
     if (res.status === 200) {
       // 로그인 성공 → sessionStorage에 저장
       login(res.data.eno);   // Zustand store + sessionStorage
-      navigate("/home");
+      navigate(`/home?eno=${eno}`);
     }
   } catch (error) {
     alert("로그인 실패: 사번 또는 비밀번호를 확인하세요.");
