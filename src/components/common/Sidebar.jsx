@@ -21,7 +21,7 @@ const Sidebar = ({ isOpen, onClose, user, onNavigate, onLogout }) => {
     {
       label: "전자결재",
       children: [
-        { label: "홈", path: "/approvalPage" },
+        { label: "홈", path: "/approval" },
         { label: "참조문서함", path: "/approval/viewerList" },
         { label: "기안문서함", path: "/approval/draftList" },
         { label: "임시문서함", path: "/approval/tempList" },
