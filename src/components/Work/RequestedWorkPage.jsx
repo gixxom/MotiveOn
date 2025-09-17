@@ -19,6 +19,39 @@ export default function RequestedWorkPage() {
     fetchRequested();
   }, []);
 
+ useEffect(() => {
+  let startX = 0;
+
+  const handleTouchStart = (e) => {
+    startX = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const diffX = endX - startX;
+
+    // 👉 스와이프 판정 (오른쪽으로 80px 이상 이동했을 때)
+  // 왼쪽 → 오른쪽 (뒤로가기)
+if (diffX > 80) {
+  navigate(-1); // history back
+}
+
+// 오른쪽 → 왼쪽 (앞으로 가기)
+if (diffX < -80) {
+  navigate(1); // history forward
+}
+
+  };
+
+  document.addEventListener("touchstart", handleTouchStart);
+  document.addEventListener("touchend", handleTouchEnd);
+
+  return () => {
+    document.removeEventListener("touchstart", handleTouchStart);
+    document.removeEventListener("touchend", handleTouchEnd);
+  };
+}, [navigate]);
+
   return (
     <div style={{ padding: "16px", height: "788px", overflow: "auto" }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: "16px", fontWeight: "bold" }}>

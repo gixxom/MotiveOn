@@ -12,6 +12,13 @@ export default function WorkDetail() {
 
   const [work, setWork] = useState(null);
 
+  // 상태 한글 변환 맵
+  const statusMap = {
+    WAIT: "대기",
+    ING: "진행중",
+    DONE: "완료",
+  };
+
   useEffect(() => {
     const fetchWorkDetail = async () => {
       try {
@@ -24,6 +31,34 @@ export default function WorkDetail() {
 
     fetchWorkDetail();
   }, [wcode]);
+
+  useEffect(() => {
+    let startX = 0;
+
+    const handleTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const diffX = endX - startX;
+
+      if (diffX > 80) {
+        navigate(-1); // history back
+      }
+      if (diffX < -80) {
+        navigate(1); // history forward
+      }
+    };
+
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [navigate]);
 
   if (!work) return <div>로딩중...</div>;
 
@@ -53,7 +88,17 @@ export default function WorkDetail() {
         {[
           { label: "요청자", value: work.requesterName || "미정" },
           { label: "담당자", value: work.managerName || "담당자 없음" },
-          { label: "기한", value: work.wend || "미정" },
+          {
+  label: "기한",
+  value: (() => {
+    const start = work.wdate ? new Date(work.wdate).toLocaleDateString() : "";
+    const end = work.wend ? new Date(work.wend).toLocaleDateString() : "";
+    if (!start && !end) return "미정";
+    return start && end ? `${start} ~ ${end}` : start || end;
+  })(),
+}
+
+
         ].map((item, idx) => (
           <div key={idx} style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
             <div style={{ width: "70px", fontSize: "13px", fontWeight: "bold", color: "#555" }}>
@@ -76,7 +121,7 @@ export default function WorkDetail() {
 
         <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
           <div style={{ width: "70px", fontSize: "13px", fontWeight: "bold", color: "#555" }}>상태</div>
-          <StatusBadge label={work.wstatus || "대기"} />
+          <StatusBadge label={statusMap[work.wstatus] || "미정"} />
         </div>
 
         <div style={{ display: "flex" }}>
@@ -104,9 +149,8 @@ export default function WorkDetail() {
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
             }}
-          >
-            {work.wcontent || "내용 없음"}
-          </div>
+            dangerouslySetInnerHTML={{ __html: work.wcontent || "내용 없음" }}
+          />
         </div>
       </div>
 

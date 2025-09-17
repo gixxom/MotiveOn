@@ -2,7 +2,7 @@ import axios from "axios";
 
 function getEno() {
   const loginUser = JSON.parse(sessionStorage.getItem("user-storage"));
-  return loginUser?.state?.user; // 이미 eno 값이 숫자로 들어있음
+  return loginUser?.state?.user?.eno;
 }
 // 요청한 업무 리스트
 export function getRequestedWork() {
@@ -28,10 +28,11 @@ export function getWorkDetail(wcode) {
 
 // 업무 등록
 export function registWork(workData, ownerEno) {
-  const eno = getEno();
-  const query = ownerEno ? `&ownerEno=${ownerEno}` : "";
+  const eno = getEno(); // 로그인 사용자 eno
+  const query = nownerEo ? `&ownerEno=${ownerEno}` : "";
   return axios.post(`/api/work/regist?requesterEno=${eno}${query}`, workData);
 }
+
 
 // 업무 상태 변경
 export function updateWorkStatus(wcode, status) {
