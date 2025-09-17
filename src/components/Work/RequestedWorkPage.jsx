@@ -31,7 +31,18 @@ export default function RequestedWorkPage() {
           <div style={{ color: "#777", fontSize: "14px" }}>업무가 없습니다.</div>
         ) : (
           workList.map((work) => (
-            <div key={work.wcode} style={{ background: "#fff", padding: "12px", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "12px" }}>
+            <div
+              key={work.wcode}
+              style={{
+                background: "#fff",
+                padding: "12px",
+                borderRadius: "12px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                marginBottom: "12px",
+                cursor: "pointer"   // 클릭 가능 느낌 추가
+              }}
+onClick={() => navigate(`/work/detail/${work.wcode}`, { state: { from: "reqlist" } })}
+            >
               <div style={{ fontWeight: "bold", marginBottom: "4px" }}>{work.wtitle || work.wcode}</div>
               <div style={{ fontSize: "13px", color: "#555" }}>
                 {work.dno} {work.managerName || "담당자 없음"}

@@ -61,7 +61,7 @@ function App() {
           <Route path="/work" element={<WorkPage />} />
           <Route path="/work/myworklist" element={<MyWorkPage />} />
           <Route path="/work/reqlist" element={<RequestedWorkPage />} />
-          <Route path="/work/detail" element={<WorkDetail />} />
+          <Route path="/work/detail/:wcode" element={<WorkDetail />} />
           <Route path="/work/detailedit" element={<WorkDetailEdit />} />
           <Route path="/work/regist" element={<WorkRegist />} />
           <Route path="/common/OrgTree" element={<OrgTree />} />
