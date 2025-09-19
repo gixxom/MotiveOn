@@ -64,16 +64,16 @@ export function getDepWorkList(dno) {
 export function getWorkDetail(wcode) {
   return axios.get(`/api/work/detail?wcode=${wcode}`);
 }
-// 업무 등록
+// 업무 등록 (세션 불필요, requesterEno만 전송)
 export function registWork(workData, ownerEnos = []) {
-  const eno = getEno(); // 로그인 사용자 eno
-  return axios.post(`/api/work/regist`, workData, {
-    params: {
-      requesterEno: eno,
-      ownerEno: ownerEnos, // 👉 배열 그대로 넘기기
-    },
-  });
+  const requesterEno = getEno(); // sessionStorage에서 로그인 사용자 eno 가져오기
+  return axios.post(
+    `/api/work/regist?requesterEno=${requesterEno}&ownerEno=${ownerEnos.join(",")}`,
+    workData
+  );
 }
+
+
 
 
 // ✅ 업무 수정 (Calendar modify와 동일 스타일)

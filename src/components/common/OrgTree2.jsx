@@ -1,12 +1,13 @@
 // src/components/common/OrgTree2.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import $ from "jquery";
 import "jstree";
 import { getOrgTree } from "../motiveOn/api";
 import "jstree/dist/themes/default/style.min.css";
 
-export default function OrgTree2({ onSelect }) {
-  const treeRef = useRef(null); 
+export default function OrgTree2({ onSelect, onClose }) {
+  const treeRef = useRef(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null); // ✅ 임시 저장
 
   useEffect(() => {
     const treeEl = $(treeRef.current);
@@ -24,7 +25,6 @@ export default function OrgTree2({ onSelect }) {
           const text = node.text || node.TEXT;
           const type = node.type || node.TYPE;
 
-          // 부서 → children 배열 (하위 가능)
           if (type === "department") {
             return {
               id,
@@ -35,17 +35,14 @@ export default function OrgTree2({ onSelect }) {
             };
           }
 
-          // 사원 → leaf node (children 없음)
           return {
             id,
             parent,
             text,
-            type,
+            type: "employee",
             icon: "jstree-file",
           };
         });
-
-        console.log(" 변환된 데이터:", data);
 
         // 기존 트리 초기화
         if (treeEl.jstree(true)) {
@@ -55,37 +52,44 @@ export default function OrgTree2({ onSelect }) {
         // jstree 초기화
         treeEl
           .jstree({
-            core: {
-              data,
-              check_callback: true,
-            },
+            core: { data, check_callback: true },
             themes: { dots: true, icons: true },
             plugins: ["search"],
           })
-          .on('select_node.jstree', function() {
-            console.log(data);          
-            $(this).jstree("open_all");
-            // if (data.node.id.startsWith("e-")) {
-            //   console.log(data.node.text);
-            //   const eno = data.node.id.replace("e-", "");
-            //   const name = data.node.text;
-            //   onSelect({ value: eno, label: name });
-            // }
+          .on("select_node.jstree", function (e, data) {
+            $(this).jstree("open_all"); // ✅ 기존 열기 로직 유지
+
+            // ✅ 사원 선택만 state 에 저장 (아직 부모에는 안 넘김)
+            if (data.node.original.type === "employee") {
+              const eno = data.node.id.replace("e-", "");
+              const name = data.node.text;
+              setSelectedEmployee({ value: eno, label: name });
+            } else {
+              setSelectedEmployee(null);
+            }
           });
       })
       .catch((err) => {
         console.error("❌ 조직도 불러오기 실패:", err);
       });
 
-      return () => {
-        if (treeEl.jstree(true)) {
-          treeEl.jstree("destroy");
-        }
+    return () => {
+      if (treeEl.jstree(true)) {
+        treeEl.jstree("destroy");
       }
-  }, [onSelect]);
+    };
+  }, []);
 
   const handleSearch = (e) => {
     $(treeRef.current).jstree(true).search(e.target.value);
+  };
+
+  // ✅ 확인 버튼 클릭 시 부모로 최종 전달
+  const handleConfirm = () => {
+    if (selectedEmployee) {
+      onSelect(selectedEmployee);
+    }
+    if (onClose) onClose();
   };
 
   return (
@@ -97,7 +101,28 @@ export default function OrgTree2({ onSelect }) {
         onKeyUp={handleSearch}
         style={{ marginBottom: "8px", width: "100%" }}
       />
-      <div ref={treeRef}></div>
+      <div
+        ref={treeRef}
+        style={{ maxHeight: "400px", overflowY: "auto", border: "1px solid #ddd", padding: "4px" }}
+      ></div>
+
+      {/* ✅ 확인 버튼 */}
+      <div style={{ marginTop: "12px", textAlign: "right" }}>
+        <button
+          onClick={handleConfirm}
+          style={{
+            padding: "8px 16px",
+            borderRadius: "6px",
+            border: "none",
+            backgroundColor: "#1976d2",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          확인
+        </button>
+      </div>
     </div>
   );
 }
