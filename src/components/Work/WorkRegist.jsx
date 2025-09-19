@@ -1,18 +1,19 @@
+// src/components/Work/WorkRegist.jsx
 import React, { useState } from "react";
 import Header from "../common/Header";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import DatePicker from "../common/DatePicker";
-import OrgTree from "../common/OrgTree";
+import OrgTree from "../common/OrgTree2"; // ✅ 조직도
 import { useNavigate, useLocation } from "react-router-dom";
 import { registWork } from "../motiveOn/api";
-import { useUserStore } from "../../store/userStore";   // ✅ 로그인 사용자 스토어
+import { useUserStore } from "../../store/userStore";   
 
 export default function WorkRegist() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, isLoggedIn } = useUserStore(); // ✅ 로그인 사용자 정보 가져오기
+  const { user, isLoggedIn } = useUserStore(); 
 
   const [showOrgTree, setShowOrgTree] = useState(false);
   const [title, setTitle] = useState("");
@@ -22,18 +23,19 @@ export default function WorkRegist() {
   const [assignees, setAssignees] = useState([]);
   const [alertMessage, setAlertMessage] = useState("");
 
-  // 담당자 선택
-  const handleSelectAssignee = (user) => {
+  // ✅ 담당자 선택
+  const handleSelectAssignee = (selectedUser) => {
+    if (!selectedUser?.value) return; // 방어 코드
+
     setAssignees((prev) => {
-      if (prev.some((a) => a.value === user.value)) {
-        return prev.filter((a) => a.value !== user.value);
-      } else {
-        return [...prev, user];
+      if (prev.some((a) => a.value === selectedUser.value)) {
+        return prev.filter((a) => a.value !== selectedUser.value);
       }
+      return [...prev, selectedUser];
     });
   };
 
-  // 저장 버튼
+  // ✅ 저장 버튼
   const handleSave = () => {
     if (!user?.eno) {
       alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
@@ -50,7 +52,7 @@ export default function WorkRegist() {
       return;
     }
 
-    const ownerEno = assignees[0].value; // 첫 번째 담당자 eno
+    const ownerEnos = assignees.map((a) => a.value);
 
     registWork(
       {
@@ -59,11 +61,12 @@ export default function WorkRegist() {
         wdate: startDate || null,
         wend: endDate || null,
       },
-      ownerEno
+      ownerEnos
     )
       .then(() => {
         alert("업무등록이 완료 되었습니다.");
-        navigate(-1);
+        // ✅ 요청한업무 리스트 페이지로 이동
+        navigate("/work/reqlist");
       })
       .catch((err) => {
         console.error(err);
@@ -139,7 +142,7 @@ export default function WorkRegist() {
           </div>
         </div>
 
-        {/* 요청자 (이름 + 부서) */}
+        {/* 요청자 */}
         <div style={fieldRowStyle}>
           <div style={labelStyle}>요청자</div>
           <div style={inputWrapperStyle}>

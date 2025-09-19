@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost/', // 톰캣 서버 호스트 + 포트
+        target: 'http://localhost:80', // 톰캣 서버 호스트 + 포트
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/motiveOn/api'), 
         // '/api/project/list/stu' → '/campus/api/project/list/stu'로 매핑
