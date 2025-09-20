@@ -1,128 +1,150 @@
 import React, { useEffect, useState } from "react";
-import { IconPlus } from "../Work/icons";
 import { useNavigate } from "react-router-dom";
-import { getMyWorkList } from "../motiveOn/api";
-import StatusBadge from "../common/StatusBadge";
+import StatusCard from "../common/StatusCard.jsx";
+import { getMyWorkList, getRequestedWork } from "../motiveOn/api";
 
-export default function MyWorkListPage() {
+export default function WorkPage() {
   const navigate = useNavigate();
-  const [workList, setWorkList] = useState([]);
+
+  const [myWorkStats, setMyWorkStats] = useState([]);
+  const [requestedWorkStats, setRequestedWorkStats] = useState([]);
+  const [weeklyDeadline, setWeeklyDeadline] = useState([]);
+
+  // 상태별 카운트 집계
+  const makeStatusCounts = (list) => {
+    const map = { WAIT: 0, PROGRESS: 0, COLLAB: 0, DELEGATE: 0, DONE: 0 };
+    list.forEach(item => {
+      if (map[item.wstatus] !== undefined) {
+        map[item.wstatus]++;
+      }
+    });
+    return [
+      { label: "대기", count: map.WAIT, color: "#d8f5d0" },
+      { label: "진행", count: map.PROGRESS, color: "#f9d9d4" },
+      { label: "협업요청", count: map.COLLAB, color: "#f3d7f9" },
+      { label: "대리요청", count: map.DELEGATE, color: "#e2e2e2" },
+      { label: "완료", count: map.DONE, color: "#fff9c4" },
+      { label: "전체", count: list.length, color: "#e0e7ff" },
+    ];
+  };
+
+  // 이번 주 범위 구하기
+  const getWeekRange = () => {
+    const today = new Date();
+    const start = new Date(today);
+    start.setDate(today.getDate() - today.getDay()); // 주 시작(일요일)
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(today);
+    end.setDate(today.getDate() + (6 - today.getDay())); // 주 끝(토요일)
+    end.setHours(23, 59, 59, 999);
+
+    return { start, end };
+  };
+
+  // 날짜 비교 함수
+  const isWithinThisWeek = (dateStr) => {
+    if (!dateStr) return false;
+    const { start, end } = getWeekRange();
+    const date = new Date(dateStr);
+    return date >= start && date <= end;
+  };
 
   useEffect(() => {
-    const fetchMyWork = async () => {
-      try {
-        const res = await getMyWorkList();
-        setWorkList(res.data.list || []);
-      } catch (err) {
-        console.error("업무 목록 가져오기 실패:", err);
-      }
-    };
-    fetchMyWork();
+    Promise.all([getMyWorkList(), getRequestedWork()])
+      .then(([myRes, reqRes]) => {
+        const myList = myRes.data.list || [];
+        const reqList = reqRes.data.list || [];
+
+        // 상태 통계
+        setMyWorkStats(makeStatusCounts(myList));
+        setRequestedWorkStats(makeStatusCounts(reqList));
+
+        // 금주 마감 업무 (내 업무 + 요청한 업무 합치고 필터링)
+        const combined = [...myList, ...reqList];
+        const deadlineList = combined.filter(w => isWithinThisWeek(w.wend));
+        setWeeklyDeadline(deadlineList);
+      })
+      .catch(err => console.error("업무 데이터 불러오기 실패:", err));
   }, []);
 
-  const statusMap = {
-    WAIT: "대기",
-    PROGRESS: "진행중",
-    DONE: "완료",
-  };
-
-  useEffect(() => {
-    let startX = 0;
-
-    const handleTouchStart = (e) => {
-      startX = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const diffX = endX - startX;
-
-      if (diffX > 80) {
-        navigate(-1);
-      }
-      if (diffX < -80) {
-        navigate(1);
-      }
-    };
-
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [navigate]);
-
-  const formatWorkPeriod = (work) => {
-    const start = work.wdate ? new Date(work.wdate).toLocaleDateString() : "";
-    const end = work.wend ? new Date(work.wend).toLocaleDateString() : "";
-    if (!start && !end) return "미정";
-    return start && end ? `${start} ~ ${end}` : start || end;
-  };
-
   return (
-    <div style={{ padding: "16px", height: "788px", overflow: "auto" }}>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: "16px", fontWeight: "bold" }}>
-        <span>내 업무 &gt; 전체</span>
-      </div>
-      <hr style={{ border: "0.1px solid #eee", margin: "8px 0" }} />
+    <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+      {/* 내 업무 */}
+      <Section title="내 업무" showMore onMoreClick={() => navigate("/work/myworklist")}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+          {myWorkStats.map((s, i) => <StatusCard key={i} {...s} />)}
+        </div>
+      </Section>
 
-      <div>
-        {workList.length === 0 ? (
-          <div style={{ color: "#777", fontSize: "14px" }}>업무가 없습니다.</div>
-        ) : (
-          workList.map((work) => (
-            <div
-              key={work.wcode}
-              style={{
-                position: "relative", // 상태 배지 absolute 기준
-                background: "#fff",
-                padding: "12px",
-                borderRadius: "12px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                marginBottom: "12px",
-                cursor: "pointer"
-              }}
-              onClick={() => navigate(`/work/detail/${work.wcode}`, { state: { from: "mywork" } })}
-            >
-              {/* 상태 배지 우측 상단 */}
-              <div style={{ position: "absolute", top: "12px", right: "12px" }}>
-                <StatusBadge label={statusMap[work.wstatus] || "미정"} />
-              </div>
+      {/* 요청한 업무 */}
+      <Section title="요청한 업무" showMore onMoreClick={() => navigate("/work/reqlist")}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+          {requestedWorkStats.map((s, i) => <StatusCard key={i} {...s} />)}
+        </div>
+      </Section>
 
-              <div style={{ fontWeight: "bold", marginBottom: "4px" }}>{work.wtitle || work.wcode}</div>
-              <div style={{ fontSize: "13px", color: "#555" }}>
-                {work.dno} {work.managerName || "담당자 없음"}
+      {/* 금주 마감 업무 */}
+      <Section title="금주 마감 업무" fullHeight>
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px" }}>
+          {weeklyDeadline.length === 0 ? (
+            <p style={{ fontSize: "13px", color: "#888" }}>마감 예정 업무가 없습니다.</p>
+          ) : (
+            weeklyDeadline.map((work, idx) => (
+              <div
+                key={work.wcode || idx}
+                style={{
+                  background: "#fff",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: "bold", marginBottom: "6px" }}>{work.wtitle}</div>
+                  <div style={{ fontSize: "13px", color: "#555" }}>
+                    {work.deptName} {work.managerName}
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#777" }}>
+                    상태: {work.wstatus}
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
+                    ~{work.wend}
+                  </div>
+                </div>
+                <div style={{ fontSize: "12px", fontWeight: "bold", whiteSpace: "nowrap" }}>
+                  {work.isMine ? "내 업무" : "요청한 업무"}
+                </div>
               </div>
-              <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
-                기한: {formatWorkPeriod(work)}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <button
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "15px",
-          width: "30px",
-          height: "30px",
-          borderRadius: "50%",
-          backgroundColor: "#52586B",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-        onClick={() => navigate("/work/regist")}
-      >
-        <IconPlus />
-      </button>
+            ))
+          )}
+        </div>
+      </Section>
     </div>
   );
 }
+
+const Section = ({ title, children, showMore, fullHeight, onMoreClick }) => (
+  <div style={{
+    background: "#fff",
+    borderRadius: "7px",
+    padding: "16px",
+    display: "flex",
+    flexDirection: "column",
+    height: fullHeight ? "300px" : "auto",
+    backgroundColor: "#f5f5f5",
+  }}>
+    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold", marginBottom: "12px" }}>
+      <span>{title}</span>
+      {showMore && (
+        <span style={{ color: "#777", fontSize: "12px", cursor: "pointer" }} onClick={onMoreClick}>
+          더보기
+        </span>
+      )}
+    </div>
+    {children}
+  </div>
+);
