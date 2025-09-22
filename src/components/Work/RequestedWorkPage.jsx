@@ -21,12 +21,12 @@ export default function RequestedWorkPage() {
     }
   };
 
-  
+
   // ✅ 최초 로딩 시 목록 불러오기
   useEffect(() => {
     fetchRequested();
   }, []);
-  
+
   // ✅ 삭제 이벤트 발생 시 새로고침
   useEffect(() => {
     const refreshHandler = () => {
@@ -37,12 +37,12 @@ export default function RequestedWorkPage() {
       window.removeEventListener("work:refresh", refreshHandler);
     };
   }, []);
-  
+
   const statusMap = {
-      WAIT: "대기",
-      PROGRESS: "진행중",
-      DONE: "완료",
-    };
+    WAIT: "대기",
+    PROGRESS: "진행중",
+    DONE: "완료",
+  };
 
   // ✅ 스와이프 네비게이션
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function RequestedWorkPage() {
     };
   }, [navigate]);
 
-const formatWorkPeriod = (work) => {
+  const formatWorkPeriod = (work) => {
     const start = work.wdate ? new Date(work.wdate).toLocaleDateString() : "";
     const end = work.wend ? new Date(work.wend).toLocaleDateString() : "";
     if (!start && !end) return "미정";
@@ -102,8 +102,7 @@ const formatWorkPeriod = (work) => {
             <div
               key={work.wcode}
               style={{
-                                position: "relative", // 상태 배지 absolute 기준
-
+                position: "relative", // 상태 배지 absolute 기준
                 background: "#fff",
                 padding: "12px",
                 borderRadius: "12px",
@@ -117,7 +116,7 @@ const formatWorkPeriod = (work) => {
                 })
               }
             >
-               {/* 상태 배지 우측 상단 */}
+              {/* 상태 배지 우측 상단 */}
               <div style={{ position: "absolute", top: "12px", right: "12px" }}>
                 <StatusBadge label={statusMap[work.wstatus] || "미정"} />
               </div>
@@ -129,7 +128,7 @@ const formatWorkPeriod = (work) => {
                 {work.managerName || "담당자 없음"}
               </div>
 
-               <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
+              <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
                 기한: {formatWorkPeriod(work)}
               </div>
             </div>

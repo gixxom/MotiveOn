@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatusCard from "../common/StatusCard.jsx";
 import { getMyWorkList, getRequestedWork } from "../motiveOn/api";
+import StatusBadge from "../common/StatusBadge";
+
 
 export default function WorkPage() {
   const navigate = useNavigate();
@@ -61,11 +63,17 @@ export default function WorkPage() {
         setRequestedWorkStats(makeStatusCounts(reqList));
 
         // 금주 마감 업무 (내 업무 + 요청한 업무 합치고 필터링)
-      const deadlineList = myList.filter(w => isWithinThisWeek(w.wend));
+        const deadlineList = myList.filter(w => isWithinThisWeek(w.wend));
         setWeeklyDeadline(deadlineList);
       })
       .catch(err => console.error("업무 데이터 불러오기 실패:", err));
   }, []);
+
+  const statusMap = {
+    WAIT: "대기",
+    PROGRESS: "진행중",
+    DONE: "완료",
+  };
 
   return (
     <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -84,7 +92,7 @@ export default function WorkPage() {
       </Section>
 
       {/* 금주 마감 업무 */}
-      <Section title="금주 마감 업무" fullHeight>
+      <Section title="금주 마감 업무 (내 업무)" fullHeight>
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px" }}>
           {weeklyDeadline.length === 0 ? (
             <p style={{ fontSize: "13px", color: "#888" }}>마감 예정 업무가 없습니다.</p>
@@ -94,6 +102,7 @@ export default function WorkPage() {
                 key={work.wcode || idx}
                 style={{
                   background: "#fff",
+                  position: "relative", // 상태 배지 absolute 기준
                   padding: "12px",
                   borderRadius: "8px",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -103,19 +112,18 @@ export default function WorkPage() {
                 }}
               >
                 <div>
+                  {/* 상태 배지 우측 상단 */}
+                  <div style={{ position: "absolute", top: "12px", right: "12px" }}>
+                    <StatusBadge label={statusMap[work.wstatus] || "미정"} />
+                  </div>
+
                   <div style={{ fontWeight: "bold", marginBottom: "6px" }}>{work.wtitle}</div>
                   <div style={{ fontSize: "13px", color: "#555" }}>
                     {work.deptName} {work.managerName}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#777" }}>
-                    상태: {work.wstatus}
-                  </div>
                   <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
                     ~{work.wend}
                   </div>
-                </div>
-                <div style={{ fontSize: "12px", fontWeight: "bold", whiteSpace: "nowrap" }}>
-                  내 업무
                 </div>
               </div>
             ))
