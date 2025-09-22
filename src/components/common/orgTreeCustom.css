@@ -1,0 +1,11 @@
+.jstree-default .jstree-clicked {
+ 
+  color: #265bc3 !important; 
+  border-radius: 4px;
+}
+
+
+.jstree-default .jstree-hovered {
+  
+  border-radius: 4px;
+}

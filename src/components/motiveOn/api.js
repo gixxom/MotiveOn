@@ -98,15 +98,16 @@ export function updateWorkStatus(wcode, status) {
 // 승인
 export function approveWork(wcode) {
   const eno = getEno();
+  // 사유 필요 없음 → wcode, eno만 전달
   return axios.post(`/api/work/approve?wcode=${wcode}&eno=${eno}`);
 }
 
 // 반려
-export function rejectWork(wcode, reason) {
+export function rejectWork(wcode) {
   const eno = getEno();
-  return axios.post(`/api/work/reject?wcode=${wcode}&reason=${reason}&eno=${eno}`);
+  // 사유 필요 없음 → wcode, eno만 전달
+  return axios.post(`/api/work/reject?wcode=${wcode}&eno=${eno}`);
 }
-
 // 이의 제기
 export function objectionWork(wcode, reason) {
   const eno = getEno();

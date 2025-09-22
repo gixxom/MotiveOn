@@ -33,7 +33,7 @@ export default function WorkDetail() {
     fetchWorkDetail();
   }, [wcode]);
 
-  // ✅ 스와이프 제스처로 뒤로가기
+  // 스와이프 제스처로 뒤로가기
   useEffect(() => {
     let touchStartX = 0;
     let touchEndX = 0;
@@ -219,7 +219,7 @@ export default function WorkDetail() {
       </div>
 
       {/* 버튼 영역 */}
-      {from === "reqlist" && (
+      {from === "reqlist" && work.wstatus === "WAIT" && (
         <div
           style={{
             borderTop: "1px solid #ddd",

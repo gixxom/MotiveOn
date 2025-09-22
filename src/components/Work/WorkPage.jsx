@@ -1,4 +1,3 @@
-// src/components/Work/WorkPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatusCard from "../common/StatusCard.jsx";
@@ -22,11 +21,11 @@ export default function WorkPage() {
     });
     return [
       { label: "대기", count: map.WAIT, color: "#d8f5d0" },
-      { label: "진행", count: map.PROGRESS, color: "#f9d9d4" },
-      { label: "협업요청", count: map.COLLAB, color: "#f3d7f9" },
+      { label: "진행", count: map.PROGRESS, color: "#c5ddf1" },
+      { label: "협업요청", count: map.COLLAB, color: "#f3dccb" },
       { label: "대리요청", count: map.DELEGATE, color: "#e2e2e2" },
       { label: "완료", count: map.DONE, color: "#fff9c4" },
-      { label: "전체", count: list.length, color: "#e0e7ff" },
+      { label: "전체", count: list.length, color: "#ecceef" },
     ];
   };
 
@@ -52,7 +51,7 @@ export default function WorkPage() {
     return date >= start && date <= end;
   };
 
-  // ✅ 날짜 포맷 함수
+  // 날짜 포맷 함수
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -82,7 +81,7 @@ export default function WorkPage() {
 
   const statusMap = {
     WAIT: "대기",
-    PROGRESS: "진행중",
+    ING: "진행중",
     DONE: "완료",
   };
 
@@ -111,7 +110,7 @@ export default function WorkPage() {
             weeklyDeadline.map((work, idx) => (
               <div
                 key={work.wcode || idx}
-                onClick={() => navigate(`/work/detail/${work.wcode}`, { state: { from: "home" } })} // ✅ 상세보기로 이동
+                onClick={() => navigate(`/work/detail/${work.wcode}`, { state: { from: "home" } })} // 상세보기로 이동
                 style={{
                   background: "#fff",
                   position: "relative",
@@ -121,20 +120,20 @@ export default function WorkPage() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "flex-start",
-                  cursor: "pointer", // ✅ 클릭 가능 표시
+                  cursor: "pointer", // 클릭 가능 표시
                 }}
               >
                 <div>
                   {/* 상태 배지 우측 상단 */}
                   <div style={{ position: "absolute", top: "12px", right: "12px" }}>
-                    <StatusBadge label={statusMap[work.wstatus] || "미정"} />
+                    <StatusBadge label={statusMap[work.wstatus] || "대기"} />
                   </div>
 
                   <div style={{ fontWeight: "bold", marginBottom: "6px" }}>{work.wtitle}</div>
                   <div style={{ fontSize: "13px", color: "#555" }}>
                     {work.deptName} {work.managerName}
                   </div>
-                  {/* ✅ 시작일 ~ 종료일 출력 */}
+                  {/* 시작일 ~ 종료일 출력 */}
                   <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
                     {formatDate(work.wdate)} ~ {formatDate(work.wend)}
                   </div>
