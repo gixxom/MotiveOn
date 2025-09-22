@@ -1,9 +1,9 @@
+// src/components/Work/WorkPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatusCard from "../common/StatusCard.jsx";
 import { getMyWorkList, getRequestedWork } from "../motiveOn/api";
 import StatusBadge from "../common/StatusBadge";
-
 
 export default function WorkPage() {
   const navigate = useNavigate();
@@ -52,6 +52,17 @@ export default function WorkPage() {
     return date >= start && date <= end;
   };
 
+  // ✅ 날짜 포맷 함수
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return ""; // 잘못된 값이면 공백 리턴
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
+
   useEffect(() => {
     Promise.all([getMyWorkList(), getRequestedWork()])
       .then(([myRes, reqRes]) => {
@@ -62,7 +73,7 @@ export default function WorkPage() {
         setMyWorkStats(makeStatusCounts(myList));
         setRequestedWorkStats(makeStatusCounts(reqList));
 
-        // 금주 마감 업무 (내 업무 + 요청한 업무 합치고 필터링)
+        // 금주 마감 업무 (내 업무만 필터링)
         const deadlineList = myList.filter(w => isWithinThisWeek(w.wend));
         setWeeklyDeadline(deadlineList);
       })
@@ -100,15 +111,17 @@ export default function WorkPage() {
             weeklyDeadline.map((work, idx) => (
               <div
                 key={work.wcode || idx}
+                onClick={() => navigate(`/work/detail/${work.wcode}`, { state: { from: "home" } })} // ✅ 상세보기로 이동
                 style={{
                   background: "#fff",
-                  position: "relative", // 상태 배지 absolute 기준
+                  position: "relative",
                   padding: "12px",
                   borderRadius: "8px",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "flex-start",
+                  cursor: "pointer", // ✅ 클릭 가능 표시
                 }}
               >
                 <div>
@@ -121,8 +134,9 @@ export default function WorkPage() {
                   <div style={{ fontSize: "13px", color: "#555" }}>
                     {work.deptName} {work.managerName}
                   </div>
+                  {/* ✅ 시작일 ~ 종료일 출력 */}
                   <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
-                    ~{work.wend}
+                    {formatDate(work.wdate)} ~ {formatDate(work.wend)}
                   </div>
                 </div>
               </div>
